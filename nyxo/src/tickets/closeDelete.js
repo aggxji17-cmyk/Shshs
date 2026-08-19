@@ -1,0 +1,7 @@
+// Tickets - Close/Delete admin
+let closeService; try{ closeService = require('../services/ticketsService'); }catch(e){ closeService=null }
+const fallbackClose={autoClose:false,deleteAfterDays:7};
+async function getCloseSettings(){ if(closeService && closeService.getCloseSettings) return closeService.getCloseSettings(); return fallbackClose }
+async function updateCloseSettings(s){ if(closeService && closeService.updateCloseSettings) return closeService.updateCloseSettings(s); Object.assign(fallbackClose,s); return fallbackClose }
+function renderClosePage(s){ const d=s||fallbackClose; return `<!doctype html><html><body><h1>Close/Delete</h1><form><label>Auto Close:<select name="autoClose"><option value="true" ${d.autoClose?'selected':''}>True</option><option value="false" ${!d.autoClose?'selected':''}>False</option></select></label><label>Delete after days:<input name="deleteAfterDays" value="${d.deleteAfterDays||7}"/></label><button onclick="save()" type="button">Save</button></form><script>async function save(){const f=document.forms[0];const body={autoClose:f.autoClose.value==='true',deleteAfterDays:parseInt(f.deleteAfterDays.value,10)||7};await fetch('/tickets/close/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getCloseSettings,updateCloseSettings,renderClosePage};

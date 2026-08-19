@@ -1,0 +1,7 @@
+// Admin Protection UI integration
+let protectionService; try{ protectionService = require('../services/protectionService'); }catch(e){ protectionService = null; }
+const fallbackProt = { enabled:true, whitelist:[] };
+async function getProtectionSettings(){ if(protectionService && protectionService.getSettings) return protectionService.getSettings(); return fallbackProt; }
+async function updateProtectionSettings(s){ if(protectionService && protectionService.updateSettings) return protectionService.updateSettings(s); Object.assign(fallbackProt,s); return fallbackProt; }
+function renderAdminProtectionPage(s){ const d=s||fallbackProt; return `<!doctype html><html><body><h1>Protection</h1><form><label>Enabled: <select name="enabled"><option value="true" ${d.enabled?'selected':''}>True</option><option value="false" ${!d.enabled?'selected':''}>False</option></select></label><label>Whitelist (comma sep):<input name="whitelist" value="${(d.whitelist||[]).join(',')||''}"/></label><button onclick="save()" type="button">Save</button></form><script>async function save(){const f=document.forms[0];const body={enabled:f.enabled.value==='true',whitelist:(f.whitelist.value||'').split(',').map(s=>s.trim()).filter(Boolean)};await fetch('/admin/protection/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getProtectionSettings,updateProtectionSettings,renderAdminProtectionPage};

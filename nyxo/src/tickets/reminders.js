@@ -1,0 +1,7 @@
+// Tickets - Reminders admin
+let remindersService; try{ remindersService = require('../services/remindersService'); }catch(e){ remindersService=null }
+const fallbackR={enabled:true};
+async function getRemindersSettings(){ if(remindersService && remindersService.getSettings) return remindersService.getSettings(); return fallbackR }
+async function updateRemindersSettings(s){ if(remindersService && remindersService.updateSettings) return remindersService.updateSettings(s); Object.assign(fallbackR,s); return fallbackR }
+function renderRemindersPage(s){ const d=s||fallbackR; return `<!doctype html><html><body><h1>Tickets Reminders</h1><form><label>Enabled:<select name="enabled"><option value="true" ${d.enabled?'selected':''}>True</option><option value="false" ${!d.enabled?'selected':''}>False</option></select></label><button onclick="save()" type="button">Save</button></form><script>async function save(){const f=document.forms[0];const body={enabled:f.enabled.value==='true'};await fetch('/tickets/reminders/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getRemindersSettings,updateRemindersSettings,renderRemindersPage};

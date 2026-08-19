@@ -1,0 +1,7 @@
+// Admin AutoMod UI integration
+let automodService; try{ automodService = require('../services/automodService'); }catch(e){ automodService=null }
+const fallbackA={enabled:true,filters:[]};
+async function getAutoModSettings(){ if(automodService && automodService.getSettings) return automodService.getSettings(); return fallbackA }
+async function updateAutoModSettings(s){ if(automodService && automodService.updateSettings) return automodService.updateSettings(s); Object.assign(fallbackA,s); return fallbackA }
+function renderAdminAutoModPage(s){ const d=s||fallbackA; return `<!doctype html><html><body><h1>AutoMod</h1><form><label>Enabled:<select name="enabled"><option value="true" ${d.enabled?'selected':''}>True</option><option value="false" ${!d.enabled?'selected':''}>False</option></select></label><label>Filters (comma sep):<input name="filters" value="${(d.filters||[]).join(',')||''}"/></label><button type="button" onclick="save()">Save</button></form><script>async function save(){const f=document.forms[0];const body={enabled:f.enabled.value==='true',filters:(f.filters.value||'').split(',').map(s=>s.trim()).filter(Boolean)};await fetch('/admin/automod/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getAutoModSettings,updateAutoModSettings,renderAdminAutoModPage};

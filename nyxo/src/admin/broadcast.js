@@ -1,0 +1,7 @@
+// Admin Broadcast UI integration
+let broadcastService; try{ broadcastService = require('../services/broadcastService'); }catch(e){ broadcastService=null }
+const fallbackB={enabled:true,defaultChannel:null};
+async function getBroadcastSettings(){ if(broadcastService && broadcastService.getSettings) return broadcastService.getSettings(); return fallbackB }
+async function updateBroadcastSettings(s){ if(broadcastService && broadcastService.updateSettings) return broadcastService.updateSettings(s); Object.assign(fallbackB,s); return fallbackB }
+function renderAdminBroadcastPage(s){ const d=s||fallbackB; return `<!doctype html><html><body><h1>Broadcast</h1><form><label>Enabled:<select name="enabled"><option value="true" ${d.enabled?'selected':''}>True</option><option value="false" ${!d.enabled?'selected':''}>False</option></select></label><label>Default Channel ID:<input name="defaultChannel" value="${d.defaultChannel||''}"/></label><button type="button" onclick="save()">Save</button></form><script>async function save(){const f=document.forms[0];const body={enabled:f.enabled.value==='true',defaultChannel:f.defaultChannel.value||null};await fetch('/admin/broadcast/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getBroadcastSettings,updateBroadcastSettings,renderAdminBroadcastPage};

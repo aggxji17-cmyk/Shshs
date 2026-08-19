@@ -1,0 +1,7 @@
+// Admin System UI integration
+let systemService; try{ systemService = require('../services/systemService'); }catch(e){ systemService=null }
+const fallbackSys={maintenance:false};
+async function getSystemSettings(){ if(systemService && systemService.getSettings) return systemService.getSettings(); return fallbackSys }
+async function updateSystemSettings(s){ if(systemService && systemService.updateSettings) return systemService.updateSettings(s); Object.assign(fallbackSys,s); return fallbackSys }
+function renderAdminSystemPage(s){ const d=s||fallbackSys; return `<!doctype html><html><body><h1>System</h1><form><label>Maintenance Mode:<select name="maintenance"><option value="false" ${d.maintenance? '':'selected'}>Off</option><option value="true" ${d.maintenance? 'selected':''}>On</option></select></label><button type="button" onclick="save()">Save</button></form><script>async function save(){const f=document.forms[0];const body={maintenance:f.maintenance.value==='true'};await fetch('/admin/system/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getSystemSettings,updateSystemSettings,renderAdminSystemPage};

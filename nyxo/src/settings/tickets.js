@@ -1,0 +1,7 @@
+// Settings - Tickets (mirror of admin) - for /settings
+let ticketsServiceSettings; try{ ticketsServiceSettings = require('../services/ticketsService'); }catch(e){ ticketsServiceSettings=null }
+const fallbackS={enabled:true};
+async function getSettingsTickets(){ if(ticketsServiceSettings && ticketsServiceSettings.getSettings) return ticketsServiceSettings.getSettings(); return fallbackS }
+async function updateSettingsTickets(s){ if(ticketsServiceSettings && ticketsServiceSettings.updateSettings) return ticketsServiceSettings.updateSettings(s); Object.assign(fallbackS,s); return fallbackS }
+function renderSettingsTicketsPage(s){ const d=s||fallbackS; return `<!doctype html><html><body><h1>Settings - Tickets</h1><form><label>Enabled:<select name="enabled"><option value="true" ${d.enabled?'selected':''}>True</option><option value="false" ${!d.enabled?'selected':''}>False</option></select></label><button onclick="save()" type="button">Save</button></form><script>async function save(){const f=document.forms[0];const body={enabled:f.enabled.value==='true'};await fetch('/settings/tickets/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getSettingsTickets,updateSettingsTickets,renderSettingsTicketsPage};

@@ -1,0 +1,7 @@
+// Settings - AutoMod
+let automodServiceSettings; try{ automodServiceSettings = require('../services/automodService'); }catch(e){ automodServiceSettings=null }
+const fallbackAS={enabled:true};
+async function getSettingsAutoMod(){ if(automodServiceSettings && automodServiceSettings.getSettings) return automodServiceSettings.getSettings(); return fallbackAS }
+async function updateSettingsAutoMod(s){ if(automodServiceSettings && automodServiceSettings.updateSettings) return automodServiceSettings.updateSettings(s); Object.assign(fallbackAS,s); return fallbackAS }
+function renderSettingsAutoModPage(s){ const d=s||fallbackAS; return `<!doctype html><html><body><h1>Settings - AutoMod</h1><form><label>Enabled:<select name="enabled"><option value="true" ${d.enabled?'selected':''}>True</option><option value="false" ${!d.enabled?'selected':''}>False</option></select></label><button onclick="save()" type="button">Save</button></form><script>async function save(){const f=document.forms[0];const body={enabled:f.enabled.value==='true'};await fetch('/settings/automod/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getSettingsAutoMod,updateSettingsAutoMod,renderSettingsAutoModPage};

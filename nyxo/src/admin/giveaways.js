@@ -1,0 +1,7 @@
+// Admin Giveaways UI integration
+let giveawaysService; try{ giveawaysService = require('../services/giveawaysService'); }catch(e){ giveawaysService = null; }
+const fallbackG = { enabled:true, hostRole:null };
+async function getGiveawaysSettings(){ if(giveawaysService && giveawaysService.getSettings) return giveawaysService.getSettings(); return fallbackG; }
+async function updateGiveawaysSettings(s){ if(giveawaysService && giveawaysService.updateSettings) return giveawaysService.updateSettings(s); Object.assign(fallbackG,s); return fallbackG; }
+function renderAdminGiveawaysPage(s){ const d=s||fallbackG; return `<!doctype html><html><body><h1>Giveaways</h1><form><label>Enabled: <select name="enabled"><option value="true" ${d.enabled?'selected':''}>True</option><option value="false" ${!d.enabled?'selected':''}>False</option></select></label><label>Host Role ID: <input name="hostRole" value="${d.hostRole||''}"/></label><button type="button" onclick="save()">Save</button></form><script>async function save(){const f=document.forms[0];const body={enabled:f.enabled.value==='true',hostRole:f.hostRole.value||null};await fetch('/admin/giveaways/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getGiveawaysSettings,updateGiveawaysSettings,renderAdminGiveawaysPage};

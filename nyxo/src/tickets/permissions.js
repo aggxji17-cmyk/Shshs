@@ -1,0 +1,7 @@
+// Tickets - Permissions admin
+let rolesService; try{ rolesService = require('../services/rolesService'); }catch(e){ rolesService=null }
+const fallbackPerm={allowedRoles:[]};
+async function getTicketPermissions(){ if(rolesService && rolesService.getTicketPermissions) return rolesService.getTicketPermissions(); return fallbackPerm }
+async function updateTicketPermissions(s){ if(rolesService && rolesService.updateTicketPermissions) return rolesService.updateTicketPermissions(s); Object.assign(fallbackPerm,s); return fallbackPerm }
+function renderPermissionsPage(s){ const d=s||fallbackPerm; return `<!doctype html><html><body><h1>Tickets Permissions</h1><form><label>Allowed Roles (comma):<input name="allowedRoles" value="${(d.allowedRoles||[]).join(',')||''}"/></label><button onclick="save()" type="button">Save</button></form><script>async function save(){const f=document.forms[0];const body={allowedRoles:(f.allowedRoles.value||'').split(',').map(s=>s.trim()).filter(Boolean)};await fetch('/tickets/permissions/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getTicketPermissions,updateTicketPermissions,renderPermissionsPage};

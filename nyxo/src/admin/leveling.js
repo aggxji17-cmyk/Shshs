@@ -1,0 +1,7 @@
+// Admin Leveling UI integration
+let levelingService; try{ levelingService = require('../services/levelingService'); }catch(e){ levelingService = null }
+const fallbackL = { enabled:true, xpPerMessage:5 };
+async function getLevelingSettings(){ if(levelingService && levelingService.getSettings) return levelingService.getSettings(); return fallbackL; }
+async function updateLevelingSettings(s){ if(levelingService && levelingService.updateSettings) return levelingService.updateSettings(s); Object.assign(fallbackL,s); return fallbackL; }
+function renderAdminLevelingPage(s){ const d=s||fallbackL; return `<!doctype html><html><body><h1>Leveling</h1><form><label>Enabled:<select name="enabled"><option value="true" ${d.enabled?'selected':''}>True</option><option value="false" ${!d.enabled?'selected':''}>False</option></select></label><label>XP per message:<input name="xpPerMessage" value="${d.xpPerMessage||5}"/></label><button type="button" onclick="save()">Save</button></form><script>async function save(){const f=document.forms[0];const body={enabled:f.enabled.value==='true',xpPerMessage:parseInt(f.xpPerMessage.value,10)||5};await fetch('/admin/leveling/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getLevelingSettings,updateLevelingSettings,renderAdminLevelingPage};

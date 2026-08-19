@@ -1,0 +1,7 @@
+// Admin Welcome UI integration
+let welcomeService; try{ welcomeService = require('../services/welcomeService'); }catch(e){ welcomeService=null }
+const fallbackW={enabled:true,welcomeChannel:null,welcomeMessage:'Welcome!'};
+async function getWelcomeSettings(){ if(welcomeService && welcomeService.getSettings) return welcomeService.getSettings(); return fallbackW }
+async function updateWelcomeSettings(s){ if(welcomeService && welcomeService.updateSettings) return welcomeService.updateSettings(s); Object.assign(fallbackW,s); return fallbackW }
+function renderAdminWelcomePage(s){ const d=s||fallbackW; return `<!doctype html><html><body><h1>Welcome</h1><form><label>Enabled:<select name="enabled"><option value="true" ${d.enabled?'selected':''}>True</option><option value="false" ${!d.enabled?'selected':''}>False</option></select></label><label>Welcome Channel ID:<input name="welcomeChannel" value="${d.welcomeChannel||''}"/></label><label>Welcome Message:<input name="welcomeMessage" value="${d.welcomeMessage||''}"/></label><button type="button" onclick="save()">Save</button></form><script>async function save(){const f=document.forms[0];const body={enabled:f.enabled.value==='true',welcomeChannel:f.welcomeChannel.value||null,welcomeMessage:f.welcomeMessage.value||''};await fetch('/admin/welcome/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getWelcomeSettings,updateWelcomeSettings,renderAdminWelcomePage};

@@ -1,0 +1,7 @@
+// Admin Logging UI integration
+let loggingService; try{ loggingService = require('../services/loggingService'); }catch(e){ loggingService=null }
+const fallbackLog={enabled:true,logChannelId:null};
+async function getLoggingSettings(){ if(loggingService && loggingService.getSettings) return loggingService.getSettings(); return fallbackLog }
+async function updateLoggingSettings(s){ if(loggingService && loggingService.updateSettings) return loggingService.updateSettings(s); Object.assign(fallbackLog,s); return fallbackLog }
+function renderAdminLoggingPage(s){ const d=s||fallbackLog; return `<!doctype html><html><body><h1>Logging</h1><form><label>Enabled:<select name="enabled"><option value="true" ${d.enabled?'selected':''}>True</option><option value="false" ${!d.enabled?'selected':''}>False</option></select></label><label>Log Channel ID:<input name="logChannelId" value="${d.logChannelId||''}"/></label><button type="button" onclick="save()">Save</button></form><script>async function save(){const f=document.forms[0];const body={enabled:f.enabled.value==='true',logChannelId:f.logChannelId.value||null};await fetch('/admin/logging/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getLoggingSettings,updateLoggingSettings,renderAdminLoggingPage};

@@ -1,0 +1,7 @@
+// Tickets - Logs admin for /tickets
+let ticketsService; try{ ticketsService = require('../services/ticketsService'); }catch(e){ ticketsService=null }
+const fallbackLogs={logsEnabled:true};
+async function getTicketLogsSettings(){ if(ticketsService && ticketsService.getLogsSettings) return ticketsService.getLogsSettings(); return fallbackLogs }
+async function updateTicketLogsSettings(s){ if(ticketsService && ticketsService.updateLogsSettings) return ticketsService.updateLogsSettings(s); Object.assign(fallbackLogs,s); return fallbackLogs }
+function renderTicketsLogsPage(s){ const d=s||fallbackLogs; return `<!doctype html><html><body><h1>Tickets Logs</h1><form><label>Logs Enabled:<select name="logsEnabled"><option value="true" ${d.logsEnabled?'selected':''}>True</option><option value="false" ${!d.logsEnabled?'selected':''}>False</option></select></label><button onclick="save()" type="button">Save</button></form><script>async function save(){const f=document.forms[0];const body={logsEnabled:f.logsEnabled.value==='true'};await fetch('/tickets/logs/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getTicketLogsSettings,updateTicketLogsSettings,renderTicketsLogsPage};

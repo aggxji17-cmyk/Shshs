@@ -1,0 +1,7 @@
+// Tickets - Status admin
+let ticketsServiceStatus; try{ ticketsServiceStatus = require('../services/ticketsService'); }catch(e){ ticketsServiceStatus=null }
+const fallbackStatus={open:true};
+async function getTicketStatusSettings(){ if(ticketsServiceStatus && ticketsServiceStatus.getStatusSettings) return ticketsServiceStatus.getStatusSettings(); return fallbackStatus }
+async function updateTicketStatusSettings(s){ if(ticketsServiceStatus && ticketsServiceStatus.updateStatusSettings) return ticketsServiceStatus.updateStatusSettings(s); Object.assign(fallbackStatus,s); return fallbackStatus }
+function renderTicketsStatusPage(s){ const d=s||fallbackStatus; return `<!doctype html><html><body><h1>Tickets Status</h1><form><label>Open by default:<select name="open"><option value="true" ${d.open?'selected':''}>True</option><option value="false" ${!d.open?'selected':''}>False</option></select></label><button onclick="save()" type="button">Save</button></form><script>async function save(){const f=document.forms[0];const body={open:f.open.value==='true'};await fetch('/tickets/status/settings',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});alert('Saved')}</script></body></html>` }
+module.exports={getTicketStatusSettings,updateTicketStatusSettings,renderTicketsStatusPage};
